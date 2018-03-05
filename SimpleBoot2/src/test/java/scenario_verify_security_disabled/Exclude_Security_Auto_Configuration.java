@@ -1,4 +1,4 @@
-package org.sample;
+package scenario_verify_security_disabled;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -39,12 +39,12 @@ import org.springframework.web.bind.annotation.RestController;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @RunWith ( SpringRunner.class )
-@SpringBootTest ( classes = SimpleDemo.SimpleApp.class , webEnvironment = WebEnvironment.RANDOM_PORT )
+@SpringBootTest ( classes = Exclude_Security_Auto_Configuration.SimpleApp.class , webEnvironment = WebEnvironment.RANDOM_PORT )
 @ActiveProfiles ( "junit" )
 @DirtiesContext
-public class SimpleDemo {
+public class Exclude_Security_Auto_Configuration {
 
-	final static private Logger logger = LoggerFactory.getLogger( SimpleDemo.class );
+	final static private Logger logger = LoggerFactory.getLogger( Exclude_Security_Auto_Configuration.class );
 
 	@BeforeClass
 	// @Before
