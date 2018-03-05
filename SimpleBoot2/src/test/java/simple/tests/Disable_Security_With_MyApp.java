@@ -1,10 +1,9 @@
-package scenario_verify_security_disabled;
+package simple.tests;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-
 
 import org.assertj.core.util.Arrays;
 import org.junit.BeforeClass;
@@ -15,21 +14,18 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.autoconfigure.security.reactive.ReactiveSecurityAutoConfiguration;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
-import org.springframework.boot.autoconfigure.security.servlet.SpringBootWebSecurityConfiguration;
+import org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.stereotype.Service;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -39,12 +35,12 @@ import org.springframework.web.bind.annotation.RestController;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @RunWith ( SpringRunner.class )
-@SpringBootTest ( classes = Exclude_Security_Auto_Configuration.SimpleApp.class , webEnvironment = WebEnvironment.RANDOM_PORT )
+@SpringBootTest ( classes = Disable_Security_With_MyApp.SimpleApp.class , webEnvironment = WebEnvironment.RANDOM_PORT )
 @ActiveProfiles ( "junit" )
 @DirtiesContext
-public class Exclude_Security_Auto_Configuration {
+public class Disable_Security_With_MyApp {
 
-	final static private Logger logger = LoggerFactory.getLogger( Exclude_Security_Auto_Configuration.class );
+	final static private Logger logger = LoggerFactory.getLogger( Disable_Security_With_MyApp.class );
 
 	@BeforeClass
 	// @Before
@@ -62,12 +58,12 @@ public class Exclude_Security_Auto_Configuration {
 	 * Simple test app that excludes security autoconfiguration
 	 *
 	 */
-	@SpringBootApplication ( //
+	@MyAppAnnotation ( //
 			exclude = {
 					SecurityAutoConfiguration.class
 			} )
 	public static class SimpleApp {
-		WebSecurityConfigurerAdapter s;
+
 		@RestController
 		static public class Hello {
 
@@ -82,19 +78,21 @@ public class Exclude_Security_Auto_Configuration {
 			@Autowired
 			ObjectMapper jsonMapper;
 
-		}
-		
-		@Service
-		@ConditionalOnProperty("does.not.exist")
+		} 
+
+		// 
+		@Configuration
+		@ConditionalOnProperty ( "does.not.exist" )
 		public static class MySecurity extends WebSecurityConfigurerAdapter {
-			public void configure ( WebSecurity web )
-					throws Exception {
-				
-				logger.info("\n\n\n *******  Ignoring all request   ****** \n\n\n") ;
-
-				web.ignoring().anyRequest() ;
-
-			}
+			 public void configure ( WebSecurity web )
+			 throws Exception {
+			
+			 logger.info( "\n\n\n ******* Ignoring all request ****** \n\n\n"
+			 );
+			
+			 web.ignoring().anyRequest();
+			
+			 }
 		}
 
 	}
@@ -104,11 +102,15 @@ public class Exclude_Security_Auto_Configuration {
 
 		logger.info( "beans loaded: {}", applicationContext.getBeanDefinitionCount() );
 
-		logger.info( "beans loaded: {}", Arrays.asList( applicationContext.getBeanDefinitionNames() ) );
-		
-//		assertThat( applicationContext.getBeanDefinitionCount() )
-//		.as( "Spring Bean count" )
-//		.isGreaterThan( 200 );
+		//logger.info( "beans loaded: {}", Arrays.asList( applicationContext.getBeanDefinitionNames() ) );
+
+		// assertThat( applicationContext.getBeanDefinitionCount() )
+		// .as( "Spring Bean count" )
+		// .isGreaterThan( 200 );
+
+		assertThat( applicationContext.containsBean( UserDetailsServiceAutoConfiguration.class.getName() ) )
+			.as( "UserDetailsServiceAutoConfiguration is disabled" )
+			.isFalse();
 
 		assertThat( applicationContext.containsBean( SecurityAutoConfiguration.class.getName() ) )
 			.as( "securityAutoConfiguration is disabled" )
