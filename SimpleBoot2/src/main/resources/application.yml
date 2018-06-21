@@ -1,0 +1,19 @@
+
+#spring.autoconfigure.exclude: org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
+
+demo: 
+  testVariable: foundIt
+  
+  
+spring:
+
+  profiles: 
+ 
+    active: active-1,active-2,active-3
+    include: 
+    - include-1
+    - include-2
+    - include-3
+    
+---
+spring.profiles: app-defaults
