@@ -1,4 +1,8 @@
 target/
+saved/
+temp/
+csap-packages/
+
 !.mvn/wrapper/maven-wrapper.jar
 
 ### STS ###
@@ -22,3 +26,5 @@ nbbuild/
 dist/
 nbdist/
 .nb-gradle/
+/logs/
+/bin/
